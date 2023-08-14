@@ -1,2 +1,2 @@
 # semgrep-go
-Go package to interact with the Semgrep CLI
+Go package to interact with the Semgrep CLI programmatically.

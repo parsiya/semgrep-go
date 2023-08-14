@@ -1,0 +1,3 @@
+[submodule "semgrep-interfaces"]
+	path = output/semgrep-interfaces
+	url = https://github.com/returntocorp/semgrep-interfaces
