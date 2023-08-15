@@ -56,3 +56,28 @@ func TestIsInstalled(t *testing.T) {
 		})
 	}
 }
+
+func TestVersion(t *testing.T) {
+	tests := []struct {
+		name    string
+		want    string
+		wantErr bool
+	}{
+		{
+			name: "1.35.0",
+			want: "1.35.0",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Version()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Version() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if got != tt.want {
+				t.Errorf("Version() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

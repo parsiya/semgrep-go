@@ -3,7 +3,9 @@ package run
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"os/exec"
+	"strings"
 
 	"github.com/parsiya/semgrep_go/output"
 )
@@ -67,6 +69,8 @@ type Options struct {
 	// Default is false, but it doesn't disable metrics for every run. E.g.,
 	// metrics are collected when pulling rules from the registry. See more at
 	// https://semgrep.dev/docs/metrics/.
+	//
+	// You can enable metrics by calling EnableMetrics().
 	metrics bool
 
 	// Output format, becomes the `--[value]` switch.
@@ -81,6 +85,16 @@ type Options struct {
 	// The Semgrep rules.
 	Rules string
 
+	// If set to false, the string in Rules is passed to Semgrep as-is. This is
+	// useful for local paths, registry rulesets (e.g., auto), or a URI
+	// with the ruleset.
+	//
+	// This is true by default. The contents of the Rules string will be stored
+	// in a temp file and the name will be used in the Semgrep CLI command.
+	//
+	// You can change this behavior by calling DontStoreRules().
+	storeRules bool
+
 	// Extra switches. The user is responsible for their validity.
 	Extra []string
 }
@@ -88,10 +102,11 @@ type Options struct {
 // Return a new Options struct.
 func DefaultOptions(rules string, paths []string) *Options {
 	return &Options{
-		Output:    JSON,
-		Verbosity: Debug,
-		Rules:     rules,
-		Paths:     paths,
+		Output:     JSON,
+		Verbosity:  Debug,
+		Rules:      rules,
+		Paths:      paths,
+		storeRules: true, // By default, rules are stored in a temp file.
 	}
 }
 
@@ -100,24 +115,33 @@ func (s *Options) EnableMetrics() {
 	s.metrics = true
 }
 
+// Do not store the rules in a text file.
+func (s *Options) DontStoreRules() {
+	s.storeRules = false
+}
+
 // Return the options as a string array that can be passed to os/exec.Command.
 func (o *Options) string() ([]string, error) {
 	var optStr []string
 
-	// Write the rules to a temporary file.
-	ruleFile, err := createTempFile(o.Rules)
-	if err != nil {
-		return nil, err
+	ruleFile := o.Rules
+	// If storeRules is true, store the rules in a temp file.
+	if o.storeRules {
+		var err error
+		ruleFile, err = createTempFile(o.Rules)
+		if err != nil {
+			return nil, err
+		}
 	}
-	// Add it to the options string.
+	// Add the rules string to the options string.
 	optStr = append(optStr, ConfigSwitch, ruleFile)
 
 	// Add metrics.
+	metrics := MetricsOff
 	if o.metrics {
-		optStr = append(optStr, MetricsOn)
-	} else {
-		optStr = append(optStr, MetricsOff)
+		metrics = MetricsOn
 	}
+	optStr = append(optStr, metrics)
 
 	// Add output format.
 	optStr = append(optStr, o.Output.String())
@@ -162,7 +186,7 @@ func internalRun(o *Options) ([]byte, error) {
 	return stdOut.Bytes(), nil
 }
 
-// Runs Semgrep. Return the output and errors (if any).
+// Runs Semgrep. Return the deserialized output and errors (if any).
 func Run(o *Options) (output.Output, error) {
 	var out output.Output
 
@@ -185,11 +209,17 @@ func Run(o *Options) (output.Output, error) {
 
 // Checks if Semgrep is installed.
 func IsInstalled() bool {
+	_, err := Version()
+	return err == nil
+}
+
+// Returns the Semgrep version.
+func Version() (string, error) {
 	cmd := exec.Command(Semgrep, VersionSwitch)
-	// Run Semgrep.
+	var stdout strings.Builder
+	cmd.Stdout = &stdout
 	if err := cmd.Run(); err != nil {
-		// Return the error.
-		return false
+		return "", fmt.Errorf("error running semgrep: %v", err)
 	}
-	return true
+	return strings.TrimSpace(stdout.String()), nil
 }
