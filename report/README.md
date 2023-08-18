@@ -1,0 +1,1 @@
+Create a report from the Semgrep JSON output.
