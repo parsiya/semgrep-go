@@ -14,5 +14,9 @@ $ gojsonschema -p v1_35_0 -o v1_35_0/output.go --verbose semgrep-interfaces/semg
 
 For more information, see: https://gist.github.com/parsiya/f005bcd5e692b3086dbfd60cb67dc943
 
+## Notes
+The schemas for v1.35.0 and v1.40.0 have some minor differences, but the generated
+structs are the same.
+
 [si]: https://github.com/returntocorp/semgrep-interfaces
 [gjson]: https://github.com/atombender/go-jsonschema
