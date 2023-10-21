@@ -3,12 +3,13 @@ package output
 import (
 	"fmt"
 
-	"github.com/parsiya/semgrep_go/output/v1_35_0"
+	"github.com/parsiya/semgrep_go/output/v1_42_0"
 )
 
 // Create an alias for the latest version of the generated Go structs for the
 // Semgrep JSON output.
-type Output = v1_35_0.SemgrepOutputV1Jsonschema
+// type Output = v1_35_0.SemgrepOutputV1Jsonschema
+type Output = v1_42_0.SemgrepOutputV1Jsonschema
 
 // Deserialize the Semgrep's JSON output to a Go struct
 func Deserialize(data []byte) (Output, error) {
