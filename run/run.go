@@ -202,7 +202,7 @@ func Run(o *Options) (output.Output, error) {
 	// there were no errors. Semgrep will store internal errors in Output.Errors
 	// which is a []CliError.
 	//
-	// We will return des as-is and let the user decide what they want to do
+	// We will return them as-is and let the user decide what they want to do
 	// with the errors.
 	return output.Deserialize(data)
 }
