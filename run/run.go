@@ -85,15 +85,17 @@ type Options struct {
 	// The Semgrep rules.
 	Rules string
 
-	// If set to false, the string in Rules is passed to Semgrep as-is. This is
-	// useful for local paths, registry rulesets (e.g., auto), or a URI
-	// with the ruleset.
+	// If set to true, it's assumed the string in Rules contains one or more
+	// Semgrep rules. The contents will be stored in a temp file and the name
+	// will be passed to Semgrep with `--config`. This is useful when we are
+	// using dynamicly created rules.
 	//
-	// This is true by default. The contents of the Rules string will be stored
-	// in a temp file and the name will be used in the Semgrep CLI command.
+	// If set to false (default), the string in Rules is passed to Semgrep
+	// as-is. This is useful for local paths, registry rulesets (e.g., auto), or
+	// a URI with the ruleset.
 	//
-	// You can change this behavior by calling DontStoreRules().
-	storeRules bool
+	// You can set it to true by calling StringRule().
+	stringRule bool
 
 	// Extra switches. The user is responsible for their validity.
 	Extra []string
@@ -102,11 +104,10 @@ type Options struct {
 // Return a new Options struct.
 func DefaultOptions(rules string, paths []string) *Options {
 	return &Options{
-		Output:     JSON,
-		Verbosity:  Debug,
-		Rules:      rules,
-		Paths:      paths,
-		storeRules: true, // By default, rules are stored in a temp file.
+		Output:    JSON,
+		Verbosity: Debug,
+		Rules:     rules,
+		Paths:     paths,
 	}
 }
 
@@ -115,9 +116,9 @@ func (s *Options) EnableMetrics() {
 	s.metrics = true
 }
 
-// Do not store the rules in a text file.
-func (s *Options) DontStoreRules() {
-	s.storeRules = false
+// Do not store the rules in a text file. Pass the rule string direclty as-is.
+func (s *Options) StringRule() {
+	s.stringRule = true
 }
 
 // Return the options as a string array that can be passed to os/exec.Command.
@@ -125,8 +126,8 @@ func (o *Options) string() ([]string, error) {
 	var optStr []string
 
 	ruleFile := o.Rules
-	// If storeRules is true, store the rules in a temp file.
-	if o.storeRules {
+	// If stringRule is true, store the rules in a temp file.
+	if o.stringRule {
 		var err error
 		ruleFile, err = createTempFile(o.Rules)
 		if err != nil {
