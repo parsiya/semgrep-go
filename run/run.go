@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"os/exec"
 	"strings"
 
@@ -83,16 +84,16 @@ type Options struct {
 	Paths []string
 
 	// The Semgrep rules.
-	Rules string
+	Rules []string
 
-	// If set to true, it's assumed the string in Rules contains one or more
-	// Semgrep rules. The contents will be stored in a temp file and the name
-	// will be passed to Semgrep with `--config`. This is useful when we are
-	// using dynamicly created rules.
+	// If false (default), the strings in Rules are passed to Semgrep as-is with
+	// one or more `--config` switches. This is useful for local paths, registry
+	// rulesets (e.g., auto), or a URI with the ruleset.
 	//
-	// If set to false (default), the string in Rules is passed to Semgrep
-	// as-is. This is useful for local paths, registry rulesets (e.g., auto), or
-	// a URI with the ruleset.
+	// If true, it's assumed the strings in Rules contains one or more Semgrep
+	// rules. The contents will be concatenated and stored in a temp file and
+	// the name will be passed to Semgrep with `--config`. This is useful when
+	// we are using dynamicly created rules.
 	//
 	// You can set it to true by calling StringRule().
 	stringRule bool
@@ -102,7 +103,7 @@ type Options struct {
 }
 
 // Return a new Options struct.
-func DefaultOptions(rules string, paths []string) *Options {
+func DefaultOptions(rules []string, paths []string) *Options {
 	return &Options{
 		Output:    JSON,
 		Verbosity: Debug,
@@ -116,7 +117,7 @@ func (s *Options) EnableMetrics() {
 	s.metrics = true
 }
 
-// Do not store the rules in a text file. Pass the rule string direclty as-is.
+// Concat all the rules together in a temp file and pass to Semgrep.
 func (s *Options) StringRule() {
 	s.stringRule = true
 }
@@ -125,17 +126,27 @@ func (s *Options) StringRule() {
 func (o *Options) string() ([]string, error) {
 	var optStr []string
 
-	ruleFile := o.Rules
 	// If stringRule is true, store the rules in a temp file.
 	if o.stringRule {
 		var err error
-		ruleFile, err = createTempFile(o.Rules)
+		// Concatenate all strings in rules together.
+		mergedRules := ""
+		for _, r := range o.Rules {
+			mergedRules += r
+		}
+		// Store them all in a temp file.
+		ruleFile, err := createTempFile(mergedRules)
 		if err != nil {
 			return nil, err
 		}
+		// Add the rules string to the options string.
+		optStr = append(optStr, ConfigSwitch, ruleFile)
+	} else {
+		// Else, each item in o.Rules must be passed with `--config`.
+		for _, r := range o.Rules {
+			optStr = append(optStr, ConfigSwitch, r)
+		}
 	}
-	// Add the rules string to the options string.
-	optStr = append(optStr, ConfigSwitch, ruleFile)
 
 	// Add metrics.
 	metrics := MetricsOff
@@ -145,12 +156,20 @@ func (o *Options) string() ([]string, error) {
 	optStr = append(optStr, metrics)
 
 	// Add output format.
+	// If output format is empty, use JSON.
+	if o.Output.String() == "" {
+		o.Output = JSON
+	}
 	optStr = append(optStr, o.Output.String())
 
 	// Add verbosity.
+	// If verbosity is empty, use Debug.
+	if o.Verbosity.String() == "" {
+		o.Verbosity = Debug
+	}
 	optStr = append(optStr, o.Verbosity.String())
 
-	// Add the extra switches.
+	// Add any extra switches.
 	optStr = append(optStr, o.Extra...)
 
 	// Add the paths.
@@ -171,6 +190,8 @@ func internalRun(o *Options) ([]byte, error) {
 	// Add them to the command.
 	cmd := exec.Command(Semgrep, opts...)
 
+	log.Printf("Running Semgrep as: %s", cmd.String())
+
 	// Set stdout and stderr.
 	var stdOut, stdErr bytes.Buffer
 	cmd.Stdout = &stdOut
@@ -187,24 +208,31 @@ func internalRun(o *Options) ([]byte, error) {
 	return stdOut.Bytes(), nil
 }
 
-// Runs Semgrep. Return the deserialized output and errors (if any).
-func Run(o *Options) (output.Output, error) {
-	var out output.Output
+// Run Semgrep and return output as-is.
+//
+// Note that just because the Semgrep command was executed, doesn't mean there
+// were no errors. Semgrep will store internal errors in Output.Errors which is
+// a []CliError.
+//
+// We will return them as-is and let the user decide what they want to do with
+// the errors.
+func (o *Options) Run() ([]byte, error) {
+	// Run Semgrep and return any errors if Semgrep did not run.
+	return internalRun(o)
+}
+
+// Run Semgrep and return the deserialized JSON output.
+func (o *Options) RunJSON() (out output.Output, err error) {
+	// Change the output format to JSON in case we made a mistake when creating
+	// the Options object.
+	o.Output = JSON
 
 	// Run Semgrep and return any errors if Semgrep did not run.
 	data, err := internalRun(o)
 	if err != nil {
 		return out, err
 	}
-
-	// If Semgrep was executed. Deserialize the output and return it.
-	//
-	// Note that just because the Semgrep command was executed, it doesn't mean
-	// there were no errors. Semgrep will store internal errors in Output.Errors
-	// which is a []CliError.
-	//
-	// We will return them as-is and let the user decide what they want to do
-	// with the errors.
+	// Deserialize the output.
 	return output.Deserialize(data)
 }
 
