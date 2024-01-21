@@ -92,7 +92,7 @@ func (m HitMap) ToStringTable(headers []string, sortByCount bool) string {
 		data[index] = []string{row.Key, row.Value}
 	}
 
-	// Create the string builder to hold the result.
+	// String builder to hold the result.
 	var final strings.Builder
 	// Create the table writer and set the destination to the string builder.
 	table := tablewriter.NewWriter(&final)
