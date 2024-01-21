@@ -33,7 +33,7 @@ for _, hit := range out.Results {
 For more examples, please see the following blog and code:
 
 * https://github.com/parsiya/semgrep-fun
-* 
+* https://parsiya.net/blog/semgrep-fun/
 
 ## Semgrep Output Structs
 The structure of the output is defined in [semgrep/semgrep-interfaces][int-gh].
