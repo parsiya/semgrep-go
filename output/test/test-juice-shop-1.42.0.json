@@ -1,0 +1,507 @@
+{
+    "errors": [],
+    "paths": {
+        "scanned": []
+    },
+    "results": [
+        {
+            "check_id": "yaml.github-actions.security.third-party-action-not-pinned-to-commit-sha.third-party-action-not-pinned-to-commit-sha",
+            "end": {
+                "col": 41,
+                "line": 23,
+                "offset": 476
+            },
+            "extra": {
+                "engine_kind": "OSS",
+                "fingerprint": "e230811edb4a4debcd70104ba8d421a379b62cd4b20e8fa18cb13125e9d507e99577d7be4d40fdcd3746c6b5372f19a1be3cc875c82e2afbe7e25d0aefee77e5_0",
+                "is_ignored": false,
+                "lines": "      uses: github/codeql-action/init@v2",
+                "message": "An action sourced from a third-party repository on GitHub is not pinned to a full length commit SHA. Pinning an action to a full length commit SHA is currently the only way to use an action as an immutable release. Pinning to a particular SHA helps mitigate the risk of a bad actor adding a backdoor to the action's repository, as they would need to generate a SHA-1 collision for a valid Git object payload.",
+                "metadata": {
+                    "category": "security",
+                    "confidence": "HIGH",
+                    "cwe": [
+                        "CWE-1357: Reliance on Insufficiently Trustworthy Component"
+                    ],
+                    "impact": "LOW",
+                    "license": "Commons Clause License Condition v1.0[LGPL-2.1-only]",
+                    "likelihood": "LOW",
+                    "owasp": "A06:2021 - Vulnerable and Outdated Components",
+                    "references": [
+                        "https://owasp.org/Top10/A06_2021-Vulnerable_and_Outdated_Components",
+                        "https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions"
+                    ],
+                    "semgrep.dev": {
+                        "rule": {
+                            "origin": "community",
+                            "rule_id": "YGUdrq",
+                            "url": "https://semgrep.dev/playground/r/9lTK6r/yaml.github-actions.security.third-party-action-not-pinned-to-commit-sha.third-party-action-not-pinned-to-commit-sha",
+                            "version_id": "9lTK6r"
+                        }
+                    },
+                    "shortlink": "https://sg.run/koLA",
+                    "source": "https://semgrep.dev/r/yaml.github-actions.security.third-party-action-not-pinned-to-commit-sha.third-party-action-not-pinned-to-commit-sha",
+                    "subcategory": [
+                        "vuln"
+                    ],
+                    "technology": [
+                        "github-actions"
+                    ],
+                    "vulnerability_class": [
+                        "Other"
+                    ]
+                },
+                "metavars": {
+                    "$USES": {
+                        "abstract_content": "github/codeql-action/init@v2",
+                        "end": {
+                            "col": 41,
+                            "line": 23,
+                            "offset": 476
+                        },
+                        "start": {
+                            "col": 13,
+                            "line": 23,
+                            "offset": 448
+                        }
+                    }
+                },
+                "severity": "WARNING",
+                "validation_state": "NO_VALIDATOR"
+            },
+            "path": "juice-shop/.github/workflows/codeql-analysis.yml",
+            "start": {
+                "col": 7,
+                "line": 23,
+                "offset": 442
+            }
+        },
+        {
+            "check_id": "javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal",
+            "end": {
+                "col": 60,
+                "line": 69,
+                "offset": 2341
+            },
+            "extra": {
+                "dataflow_trace": {
+                    "intermediate_vars": [],
+                    "taint_sink": [
+                        "CliLoc",
+                        [
+                            {
+                                "end": {
+                                    "col": 60,
+                                    "line": 69,
+                                    "offset": 2341
+                                },
+                                "path": "juice-shop/routes/dataErasure.ts",
+                                "start": {
+                                    "col": 45,
+                                    "line": 69,
+                                    "offset": 2326
+                                }
+                            },
+                            "req.body.layout"
+                        ]
+                    ],
+                    "taint_source": [
+                        "CliLoc",
+                        [
+                            {
+                                "end": {
+                                    "col": 53,
+                                    "line": 69,
+                                    "offset": 2334
+                                },
+                                "path": "juice-shop/routes/dataErasure.ts",
+                                "start": {
+                                    "col": 45,
+                                    "line": 69,
+                                    "offset": 2326
+                                }
+                            },
+                            "req.body"
+                        ]
+                    ]
+                },
+                "engine_kind": "OSS",
+                "fingerprint": "7e57a9c8b7929cc2d6403ec5290b28554939fce68110b5947dc486cc921cd6a1684650093f3d99779655350dfbc0d4af32966c4e5031f5e876321ea51ba8932f_0",
+                "is_ignored": false,
+                "lines": "      const filePath: string = path.resolve(req.body.layout).toLowerCase()",
+                "message": "Possible writing outside of the destination, make sure that the target path is nested in the intended destination",
+                "metadata": {
+                    "category": "security",
+                    "confidence": "MEDIUM",
+                    "cwe": [
+                        "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+                    ],
+                    "cwe2021-top25": true,
+                    "cwe2022-top25": true,
+                    "impact": "MEDIUM",
+                    "license": "Commons Clause License Condition v1.0[LGPL-2.1-only]",
+                    "likelihood": "HIGH",
+                    "owasp": [
+                        "A05:2017 - Broken Access Control",
+                        "A01:2021 - Broken Access Control"
+                    ],
+                    "references": [
+                        "https://owasp.org/www-community/attacks/Path_Traversal"
+                    ],
+                    "semgrep.dev": {
+                        "rule": {
+                            "origin": "community",
+                            "rule_id": "L1Uyb8",
+                            "url": "https://semgrep.dev/playground/r/44Tolp/javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal",
+                            "version_id": "44Tolp"
+                        }
+                    },
+                    "shortlink": "https://sg.run/weRn",
+                    "source": "https://semgrep.dev/r/javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal",
+                    "subcategory": [
+                        "vuln"
+                    ],
+                    "technology": [
+                        "express",
+                        "node.js"
+                    ],
+                    "vulnerability_class": [
+                        "Path Traversal"
+                    ]
+                },
+                "metavars": {
+                    "$1": {
+                        "abstract_content": "post",
+                        "end": {
+                            "col": 5,
+                            "line": 1,
+                            "offset": 4
+                        },
+                        "start": {
+                            "col": 1,
+                            "line": 1,
+                            "offset": 0
+                        }
+                    },
+                    "$APP": {
+                        "abstract_content": "router",
+                        "end": {
+                            "col": 7,
+                            "line": 54,
+                            "offset": 1748
+                        },
+                        "propagated_value": {
+                            "svalue_abstract_content": "express.Router()",
+                            "svalue_end": {
+                                "col": 32,
+                                "line": 15,
+                                "offset": 658
+                            },
+                            "svalue_start": {
+                                "col": 16,
+                                "line": 15,
+                                "offset": 642
+                            }
+                        },
+                        "start": {
+                            "col": 1,
+                            "line": 54,
+                            "offset": 1742
+                        }
+                    },
+                    "$METHOD": {
+                        "abstract_content": "post",
+                        "end": {
+                            "col": 12,
+                            "line": 54,
+                            "offset": 1753
+                        },
+                        "start": {
+                            "col": 8,
+                            "line": 54,
+                            "offset": 1749
+                        }
+                    },
+                    "$NEXT": {
+                        "abstract_content": "next",
+                        "end": {
+                            "col": 134,
+                            "line": 54,
+                            "offset": 1875
+                        },
+                        "start": {
+                            "col": 130,
+                            "line": 54,
+                            "offset": 1871
+                        }
+                    },
+                    "$PATH": {
+                        "abstract_content": "path",
+                        "end": {
+                            "col": 36,
+                            "line": 69,
+                            "offset": 2317
+                        },
+                        "start": {
+                            "col": 32,
+                            "line": 69,
+                            "offset": 2313
+                        }
+                    },
+                    "$REQ": {
+                        "abstract_content": "req",
+                        "end": {
+                            "col": 48,
+                            "line": 69,
+                            "offset": 2329
+                        },
+                        "start": {
+                            "col": 45,
+                            "line": 69,
+                            "offset": 2326
+                        }
+                    },
+                    "$RES": {
+                        "abstract_content": "res",
+                        "end": {
+                            "col": 118,
+                            "line": 54,
+                            "offset": 1859
+                        },
+                        "start": {
+                            "col": 115,
+                            "line": 54,
+                            "offset": 1856
+                        }
+                    },
+                    "$SINK": {
+                        "abstract_content": "req.body.layout",
+                        "end": {
+                            "col": 60,
+                            "line": 69,
+                            "offset": 2341
+                        },
+                        "start": {
+                            "col": 45,
+                            "line": 69,
+                            "offset": 2326
+                        }
+                    }
+                },
+                "severity": "WARNING",
+                "validation_state": "NO_VALIDATOR"
+            },
+            "path": "juice-shop/routes/dataErasure.ts",
+            "start": {
+                "col": 45,
+                "line": 69,
+                "offset": 2326
+            }
+        },
+        {
+            "check_id": "javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal",
+            "end": {
+                "col": 56,
+                "line": 14,
+                "offset": 471
+            },
+            "extra": {
+                "dataflow_trace": {
+                    "intermediate_vars": [
+                        {
+                            "content": "params",
+                            "location": {
+                                "end": {
+                                    "col": 19,
+                                    "line": 10,
+                                    "offset": 295
+                                },
+                                "path": "juice-shop/routes/quarantineServer.ts",
+                                "start": {
+                                    "col": 13,
+                                    "line": 10,
+                                    "offset": 289
+                                }
+                            }
+                        },
+                        {
+                            "content": "file",
+                            "location": {
+                                "end": {
+                                    "col": 15,
+                                    "line": 11,
+                                    "offset": 369
+                                },
+                                "path": "juice-shop/routes/quarantineServer.ts",
+                                "start": {
+                                    "col": 11,
+                                    "line": 11,
+                                    "offset": 365
+                                }
+                            }
+                        }
+                    ],
+                    "taint_sink": [
+                        "CliLoc",
+                        [
+                            {
+                                "end": {
+                                    "col": 56,
+                                    "line": 14,
+                                    "offset": 471
+                                },
+                                "path": "juice-shop/routes/quarantineServer.ts",
+                                "start": {
+                                    "col": 52,
+                                    "line": 14,
+                                    "offset": 467
+                                }
+                            },
+                            "file"
+                        ]
+                    ],
+                    "taint_source": [
+                        "CliLoc",
+                        [
+                            {
+                                "end": {
+                                    "col": 19,
+                                    "line": 10,
+                                    "offset": 295
+                                },
+                                "path": "juice-shop/routes/quarantineServer.ts",
+                                "start": {
+                                    "col": 13,
+                                    "line": 10,
+                                    "offset": 289
+                                }
+                            },
+                            "params"
+                        ]
+                    ]
+                },
+                "engine_kind": "OSS",
+                "fingerprint": "c55cfb86738fea26f0ad106db1de6010fc0c3a685228414000d17026b239438bf17cddfe49dfd6e41f3f178165f178197379a06c774c34ff61c0bde40ebae114_0",
+                "is_ignored": false,
+                "lines": "      res.sendFile(path.resolve('ftp/quarantine/', file))",
+                "message": "Possible writing outside of the destination, make sure that the target path is nested in the intended destination",
+                "metadata": {
+                    "category": "security",
+                    "confidence": "MEDIUM",
+                    "cwe": [
+                        "CWE-22: Improper Limitation of a Pathname to a Restricted Directory ('Path Traversal')"
+                    ],
+                    "cwe2021-top25": true,
+                    "cwe2022-top25": true,
+                    "impact": "MEDIUM",
+                    "license": "Commons Clause License Condition v1.0[LGPL-2.1-only]",
+                    "likelihood": "HIGH",
+                    "owasp": [
+                        "A05:2017 - Broken Access Control",
+                        "A01:2021 - Broken Access Control"
+                    ],
+                    "references": [
+                        "https://owasp.org/www-community/attacks/Path_Traversal"
+                    ],
+                    "semgrep.dev": {
+                        "rule": {
+                            "origin": "community",
+                            "rule_id": "L1Uyb8",
+                            "url": "https://semgrep.dev/playground/r/44Tolp/javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal",
+                            "version_id": "44Tolp"
+                        }
+                    },
+                    "shortlink": "https://sg.run/weRn",
+                    "source": "https://semgrep.dev/r/javascript.express.security.audit.express-path-join-resolve-traversal.express-path-join-resolve-traversal",
+                    "subcategory": [
+                        "vuln"
+                    ],
+                    "technology": [
+                        "express",
+                        "node.js"
+                    ],
+                    "vulnerability_class": [
+                        "Path Traversal"
+                    ]
+                },
+                "metavars": {
+                    "$NEXT": {
+                        "abstract_content": "next",
+                        "end": {
+                            "col": 58,
+                            "line": 10,
+                            "offset": 334
+                        },
+                        "start": {
+                            "col": 54,
+                            "line": 10,
+                            "offset": 330
+                        }
+                    },
+                    "$REQ": {
+                        "abstract_content": "params",
+                        "end": {
+                            "col": 19,
+                            "line": 10,
+                            "offset": 295
+                        },
+                        "start": {
+                            "col": 13,
+                            "line": 10,
+                            "offset": 289
+                        }
+                    },
+                    "$RES": {
+                        "abstract_content": "res",
+                        "end": {
+                            "col": 42,
+                            "line": 10,
+                            "offset": 318
+                        },
+                        "start": {
+                            "col": 39,
+                            "line": 10,
+                            "offset": 315
+                        }
+                    },
+                    "$SINK": {
+                        "abstract_content": "file",
+                        "end": {
+                            "col": 56,
+                            "line": 14,
+                            "offset": 471
+                        },
+                        "propagated_value": {
+                            "svalue_abstract_content": "params.file",
+                            "svalue_end": {
+                                "col": 29,
+                                "line": 11,
+                                "offset": 383
+                            },
+                            "svalue_start": {
+                                "col": 18,
+                                "line": 11,
+                                "offset": 372
+                            }
+                        },
+                        "start": {
+                            "col": 52,
+                            "line": 14,
+                            "offset": 467
+                        }
+                    }
+                },
+                "severity": "WARNING",
+                "validation_state": "NO_VALIDATOR"
+            },
+            "path": "juice-shop/routes/quarantineServer.ts",
+            "start": {
+                "col": 52,
+                "line": 14,
+                "offset": 467
+            }
+        }
+    ],
+    "skipped_rules": [],
+    "version": "1.42.0"
+}
