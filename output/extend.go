@@ -48,7 +48,8 @@ func (c CliMatch) Message() string {
 // Return the value of a metavariable in the result. We will convert the
 // metavariable name to upper case and prepend it with `$` if it's missing.
 // E.g., `path` -> `$PATH`. If both `abstract_content` and `propagated_value`
-// fields are populated, we return `propagated_value`.
+// fields are populated, we return `propagated_value`. Return an error if the
+// metavariable doesn't exist.
 func (c CliMatch) Metavar(name string) (string, error) {
 	// Convert the string to upper case.
 	up := strings.ToUpper(name)
@@ -67,4 +68,21 @@ func (c CliMatch) Metavar(name string) (string, error) {
 		return val.AbstractContent, nil
 	}
 	return "", fmt.Errorf("Metavariable %s doesn't exist in the result.", name)
+}
+
+// Return the value of a metadata field. These come directly from the metadata
+// field in the rule. They're freeform, but usually map[string]interface{}.
+// Return an error if they key doesn't exist.
+func (c CliMatch) Metadata(name string) (interface{}, error) {
+	// try to cast it to map[string]interface{}
+	cast, ok := c.Extra.Metadata.(map[string]interface{})
+	if !ok {
+		return nil, fmt.Errorf("Couldn't cast metadata to map[string]interface{}. Got: %T", c.Extra.Metadata)
+	}
+
+	// Check if the key exists in the map
+	if val, exists := cast[name]; exists {
+		return val, nil
+	}
+	return nil, fmt.Errorf("Metadata field %s doesn't exist in result.", name)
 }
